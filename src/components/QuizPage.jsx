@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { COLORS } from '../constants/colors.js';
 import { quizQuestions } from '../data/electionData.js';
-import { trackEvent } from '../firebase.js';
+import { trackQuizEvent } from '../firebase.js';
 
 export default function QuizPage() {
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
-  const [answers, setAnswers] = useState([]);
+  const [startTime, setStartTime] = useState(Date.now());
   
   const [leaderboard, setLeaderboard] = useState([]);
   const [leaderboardLoading, setLeaderboardLoading] = useState(false);
@@ -19,7 +19,8 @@ export default function QuizPage() {
   const q = quizQuestions[current];
 
   useEffect(() => {
-    trackEvent("quiz_started");
+    trackQuizEvent('started', { timestamp: Date.now() });
+    setStartTime(Date.now());
   }, []);
 
   const fetchLeaderboard = async () => {
@@ -50,7 +51,11 @@ export default function QuizPage() {
     setSelected(i);
     const correct = i === q.ans;
     if (correct) setScore(s => s + 1);
-    setAnswers(a => [...a, { correct, chosen: i, answer: q.ans }]);
+    
+    trackQuizEvent('answered', { 
+      question: current + 1, 
+      correct: correct 
+    });
   };
 
   const next = () => { 
@@ -59,7 +64,12 @@ export default function QuizPage() {
       setSelected(null); 
     } else { 
       const pct = Math.round((score / quizQuestions.length) * 100);
-      trackEvent("quiz_completed", { score, percentage: pct });
+      const timeTaken = Math.round((Date.now() - startTime) / 1000);
+      trackQuizEvent('completed', { 
+        score, 
+        percentage: pct,
+        time_taken: timeTaken
+      });
       setDone(true); 
     } 
   };
@@ -69,10 +79,10 @@ export default function QuizPage() {
     setSelected(null); 
     setScore(0); 
     setDone(false); 
-    setAnswers([]); 
     setSubmitted(false); 
     setPlayerName(""); 
-    trackEvent("quiz_started");
+    setStartTime(Date.now());
+    trackQuizEvent('started', { timestamp: Date.now() });
   };
 
   const submitScore = async (e) => {
@@ -97,7 +107,6 @@ export default function QuizPage() {
         body: JSON.stringify(scoreData)
       });
       if (!res.ok) throw new Error("Failed to save");
-      // Fetch fresh leaderboard after saving
       fetchLeaderboard();
     } catch (err) {
       console.log("Fallback: Saving to localStorage");
@@ -129,32 +138,33 @@ export default function QuizPage() {
     cursor: "pointer",
     minHeight: "44px",
     minWidth: "44px",
+    fontFamily: COLORS.fonts.body,
   };
 
   if (done) {
     const pct = Math.round((score / quizQuestions.length) * 100);
     return (
       <div>
-        <h2 style={{ fontSize: "24px", color: COLORS.navy, marginBottom: "24px" }}>Quiz Results</h2>
+        <h2 style={{ fontSize: "24px", color: COLORS.navy, marginBottom: "24px", fontFamily: COLORS.fonts.heading }}>Quiz Results</h2>
         <div style={{ ...cardStyle, textAlign: "center", padding: "40px" }}>
           <div style={{ fontSize: "64px", marginBottom: "16px" }}>{pct >= 80 ? "🏆" : pct >= 60 ? "👍" : "📚"}</div>
-          <div style={{ fontSize: "48px", fontWeight: "bold", color: pct >= 80 ? COLORS.green : pct >= 60 ? COLORS.saffron : COLORS.navyLight, marginBottom: "8px" }}>{score}/{quizQuestions.length}</div>
-          <div style={{ fontSize: "18px", color: COLORS.textMuted, marginBottom: "24px" }}>{pct >= 80 ? "Excellent! You know Indian elections well! 🇮🇳" : pct >= 60 ? "Good effort! Review a few sections." : "Keep learning — explore the sections above!"}</div>
+          <div style={{ fontSize: "48px", fontWeight: "bold", color: pct >= 80 ? COLORS.green : pct >= 60 ? COLORS.saffron : COLORS.navyLight, marginBottom: "8px", fontFamily: COLORS.fonts.heading }}>{score}/{quizQuestions.length}</div>
+          <div style={{ fontSize: "18px", color: COLORS.textMuted, marginBottom: "24px", fontFamily: COLORS.fonts.body }}>{pct >= 80 ? "Excellent! You know Indian elections well! 🇮🇳" : pct >= 60 ? "Good effort! Review a few sections." : "Keep learning — explore the sections above!"}</div>
           
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", maxWidth: "300px", margin: "0 auto 32px" }}>
             <div style={{ background: `${COLORS.green}15`, borderRadius: "10px", padding: "14px" }}>
-              <div style={{ fontSize: "24px", fontWeight: "bold", color: COLORS.green }}>{score}</div>
-              <div style={{ fontSize: "12px", color: COLORS.textMuted }}>Correct</div>
+              <div style={{ fontSize: "24px", fontWeight: "bold", color: COLORS.green, fontFamily: COLORS.fonts.heading }}>{score}</div>
+              <div style={{ fontSize: "12px", color: COLORS.textMuted, fontFamily: COLORS.fonts.body }}>Correct</div>
             </div>
             <div style={{ background: `${COLORS.saffron}15`, borderRadius: "10px", padding: "14px" }}>
-              <div style={{ fontSize: "24px", fontWeight: "bold", color: COLORS.saffron }}>{quizQuestions.length - score}</div>
-              <div style={{ fontSize: "12px", color: COLORS.textMuted }}>Wrong</div>
+              <div style={{ fontSize: "24px", fontWeight: "bold", color: COLORS.saffron, fontFamily: COLORS.fonts.heading }}>{quizQuestions.length - score}</div>
+              <div style={{ fontSize: "12px", color: COLORS.textMuted, fontFamily: COLORS.fonts.body }}>Wrong</div>
             </div>
           </div>
 
           {/* Submit Score Form */}
           <div style={{ maxWidth: "400px", margin: "0 auto 32px", textAlign: "left", background: "#f9f7f4", padding: "20px", borderRadius: "12px" }}>
-            <h3 style={{ margin: "0 0 12px", fontSize: "16px", color: COLORS.navy }}>Join the Leaderboard</h3>
+            <h3 style={{ margin: "0 0 12px", fontSize: "16px", color: COLORS.navy, fontFamily: COLORS.fonts.heading }}>Join the Leaderboard</h3>
             {!submitted ? (
               <form onSubmit={submitScore} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                 <input 
@@ -163,43 +173,39 @@ export default function QuizPage() {
                   placeholder="Enter your name for leaderboard" 
                   required 
                   aria-label="Enter your name for leaderboard"
-                  style={{ minHeight: "44px", padding: "10px", borderRadius: "8px", border: `1px solid ${COLORS.border}`, fontFamily: "inherit", fontSize: "14px", outline: "none" }} 
-                  onFocus={e => { e.target.style.outline = "3px solid #FF6B00"; e.target.style.outlineOffset = "2px"; }}
-                  onBlur={e => e.target.style.outline = "none"}
+                  style={{ minHeight: "44px", padding: "10px", borderRadius: "8px", border: `1px solid ${COLORS.border}`, fontFamily: COLORS.fonts.body, fontSize: "14px", outline: "none" }} 
                 />
                 <button 
                   type="submit" 
                   style={btnStyle}
-                  onFocus={e => { e.target.style.outline = "3px solid #FF6B00"; e.target.style.outlineOffset = "2px"; }}
-                  onBlur={e => e.target.style.outline = "none"}
                 >
                   Save Score 🏆
                 </button>
               </form>
             ) : (
-              <div style={{ background: `${COLORS.green}15`, color: COLORS.green, padding: "12px", borderRadius: "8px", fontWeight: "bold", textAlign: "center" }}>✅ Score Saved!</div>
+              <div style={{ background: `${COLORS.green}15`, color: COLORS.green, padding: "12px", borderRadius: "8px", fontWeight: "bold", textAlign: "center", fontFamily: COLORS.fonts.body }}>✅ Score Saved!</div>
             )}
           </div>
 
           {/* Leaderboard */}
           <div style={{ textAlign: "left", maxWidth: "500px", margin: "0 auto 32px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", borderBottom: `2px solid ${COLORS.saffron}`, paddingBottom: "8px", marginBottom: "16px" }}>
-              <h3 style={{ margin: 0, fontSize: "18px", color: COLORS.navy }}>🏆 Top 10 Leaderboard</h3>
-              {leaderboardSource === "local" && <span style={{ fontSize: "11px", color: COLORS.saffron, fontWeight: "bold" }}>Local Leaderboard (offline mode)</span>}
+              <h3 style={{ margin: 0, fontSize: "18px", color: COLORS.navy, fontFamily: COLORS.fonts.heading }}>🏆 Top 10 Leaderboard</h3>
+              {leaderboardSource === "local" && <span style={{ fontSize: "11px", color: COLORS.saffron, fontWeight: "bold", fontFamily: COLORS.fonts.body }}>Local Leaderboard (offline mode)</span>}
             </div>
             
             {leaderboardLoading ? (
-              <div style={{ textAlign: "center", padding: "20px", color: COLORS.textMuted }}>Loading leaderboard...</div>
+              <div style={{ textAlign: "center", padding: "20px", color: COLORS.textMuted, fontFamily: COLORS.fonts.body }}>Loading leaderboard...</div>
             ) : leaderboard.length > 0 ? (
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <div style={{ display: "flex", padding: "4px 14px", fontSize: "12px", color: COLORS.textMuted, fontWeight: "bold" }}>
+                <div style={{ display: "flex", padding: "4px 14px", fontSize: "12px", color: COLORS.textMuted, fontWeight: "bold", fontFamily: COLORS.fonts.body }}>
                   <div style={{ width: "40px" }}>Rank</div>
                   <div style={{ flex: 1 }}>Name</div>
                   <div style={{ width: "60px", textAlign: "right" }}>Score</div>
                   <div style={{ width: "50px", textAlign: "right" }}>%</div>
                 </div>
                 {leaderboard.map((l, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", background: l.name === playerName ? `${COLORS.saffron}15` : "#f9f7f4", padding: "10px 14px", borderRadius: "8px", fontSize: "14px" }}>
+                  <div key={i} style={{ display: "flex", alignItems: "center", background: l.name === playerName ? `${COLORS.saffron}15` : "#f9f7f4", padding: "10px 14px", borderRadius: "8px", fontSize: "14px", fontFamily: COLORS.fonts.body }}>
                     <div style={{ width: "40px", fontSize: "16px" }}>
                       {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`}
                     </div>
@@ -212,15 +218,13 @@ export default function QuizPage() {
                 ))}
               </div>
             ) : (
-              <div style={{ color: COLORS.textMuted, fontSize: "14px", textAlign: "center", padding: "20px" }}>No scores yet. Be the first!</div>
+              <div style={{ color: COLORS.textMuted, fontSize: "14px", textAlign: "center", padding: "20px", fontFamily: COLORS.fonts.body }}>No scores yet. Be the first!</div>
             )}
           </div>
 
           <button 
             style={{...btnStyle, background: COLORS.navyLight}} 
             onClick={reset}
-            onFocus={e => { e.target.style.outline = "3px solid #FF6B00"; e.target.style.outlineOffset = "2px"; }}
-            onBlur={e => e.target.style.outline = "none"}
           >
             Try Again 🔄
           </button>
@@ -231,17 +235,17 @@ export default function QuizPage() {
 
   return (
     <div>
-      <h2 style={{ fontSize: "24px", color: COLORS.navy, marginBottom: "8px" }}>Civic Knowledge Quiz</h2>
-      <p style={{ fontSize: "16px", color: COLORS.textMuted, marginBottom: "24px" }}>Test your understanding of the Indian election process.</p>
+      <h2 style={{ fontSize: "24px", color: COLORS.navy, marginBottom: "8px", fontFamily: COLORS.fonts.heading }}>Civic Knowledge Quiz</h2>
+      <p style={{ fontSize: "16px", color: COLORS.textMuted, marginBottom: "24px", fontFamily: COLORS.fonts.body }}>Test your understanding of the Indian election process.</p>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-        <div style={{ fontSize: "14px", color: COLORS.textMuted }} aria-live="polite">Question {current + 1} of {quizQuestions.length}</div>
-        <div style={{ fontSize: "14px", color: COLORS.green, fontWeight: "700" }}>Score: {score}</div>
+        <div style={{ fontSize: "14px", color: COLORS.textMuted, fontFamily: COLORS.fonts.body }} aria-live="polite">Question {current + 1} of {quizQuestions.length}</div>
+        <div style={{ fontSize: "14px", color: COLORS.green, fontWeight: "700", fontFamily: COLORS.fonts.body }}>Score: {score}</div>
       </div>
       <div style={{ background: "#fff", borderRadius: "4px", height: "6px", marginBottom: "24px", overflow: "hidden" }}>
         <div style={{ height: "100%", background: COLORS.saffron, width: `${((current) / quizQuestions.length) * 100}%`, transition: "width 0.3s" }} />
       </div>
       <div style={{...cardStyle, padding: "32px"}}>
-        <h3 style={{ fontSize: "18px", color: COLORS.navy, marginBottom: "24px", lineHeight: 1.5 }}>{q.q}</h3>
+        <h3 style={{ fontSize: "18px", color: COLORS.navy, marginBottom: "24px", lineHeight: 1.5, fontFamily: COLORS.fonts.heading }}>{q.q}</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "24px" }} role="radiogroup" aria-label="Quiz options">
           {q.opts.map((opt, i) => {
             let bg = "#f9f7f4", border = COLORS.border, color = COLORS.text;
@@ -256,9 +260,7 @@ export default function QuizPage() {
                 role="radio"
                 aria-checked={selected === i ? "true" : "false"}
                 aria-label={`Option ${["A", "B", "C", "D"][i]}: ${opt}`}
-                style={{ minHeight: "44px", background: bg, border: `2px solid ${border}`, borderRadius: "10px", padding: "14px 18px", cursor: selected !== null ? "default" : "pointer", fontFamily: "inherit", fontSize: "15px", color, textAlign: "left", transition: "all 0.2s", fontWeight: selected !== null && i === q.ans ? "700" : "400" }}
-                onFocus={e => { if(selected === null) { e.target.style.outline = "3px solid #FF6B00"; e.target.style.outlineOffset = "2px"; } }}
-                onBlur={e => e.target.style.outline = "none"}
+                style={{ minHeight: "44px", background: bg, border: `2px solid ${border}`, borderRadius: "10px", padding: "14px 18px", cursor: selected !== null ? "default" : "pointer", fontFamily: COLORS.fonts.body, fontSize: "15px", color, textAlign: "left", transition: "all 0.2s", fontWeight: selected !== null && i === q.ans ? "700" : "400" }}
               >
                 <span style={{ fontWeight: "700", marginRight: "12px" }}>{["A", "B", "C", "D"][i]}.</span>{opt}
                 {selected !== null && i === q.ans && " ✓"}
@@ -269,16 +271,14 @@ export default function QuizPage() {
         </div>
         {selected !== null && (
           <div style={{ background: `${COLORS.ashoka}10`, border: `1px solid ${COLORS.ashoka}30`, borderRadius: "10px", padding: "16px", marginBottom: "20px" }}>
-            <div style={{ fontSize: "12px", fontWeight: "700", color: COLORS.ashoka, marginBottom: "6px" }}>📖 Explanation</div>
-            <div style={{ fontSize: "14px", color: COLORS.text, lineHeight: 1.6 }}>{q.exp}</div>
+            <div style={{ fontSize: "12px", fontWeight: "700", color: COLORS.ashoka, marginBottom: "6px", fontFamily: COLORS.fonts.body }}>📖 Explanation</div>
+            <div style={{ fontSize: "14px", color: COLORS.text, lineHeight: 1.6, fontFamily: COLORS.fonts.body }}>{q.exp}</div>
           </div>
         )}
         {selected !== null && (
           <button 
             style={{...btnStyle, width: "100%"}} 
             onClick={next}
-            onFocus={e => { e.target.style.outline = "3px solid #FF6B00"; e.target.style.outlineOffset = "2px"; }}
-            onBlur={e => e.target.style.outline = "none"}
           >
             {current < quizQuestions.length - 1 ? "Next Question →" : "See Results 🏆"}
           </button>

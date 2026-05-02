@@ -15,4 +15,12 @@ export const COLORS = {
   textMuted: "#5a5a7a",
   cardBg: "#ffffff",
   border: "#e8e0d5",
+  fonts: {
+    heading: "'Playfair Display', Georgia, serif",
+    body: "'Inter', system-ui, sans-serif",
+    hindi: "'Tiro Devanagari Hindi', serif",
+    tamil: "'Noto Sans Tamil', sans-serif",
+    telugu: "'Noto Sans Telugu', sans-serif",
+    bengali: "'Noto Sans Bengali', sans-serif",
+  }
 };

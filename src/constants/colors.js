@@ -1,0 +1,18 @@
+export const COLORS = {
+  saffron: "#FF6B00",
+  saffronLight: "#FF8C35",
+  saffronDark: "#CC5500",
+  green: "#138808",
+  greenLight: "#1aab0a",
+  navy: "#0a0f2e",
+  navyMid: "#141b45",
+  navyLight: "#1e2a5e",
+  white: "#FAFAF8",
+  cream: "#FFF8EE",
+  gold: "#D4A017",
+  ashoka: "#0047AB",
+  text: "#1a1a2e",
+  textMuted: "#5a5a7a",
+  cardBg: "#ffffff",
+  border: "#e8e0d5",
+};

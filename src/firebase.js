@@ -59,10 +59,10 @@ export const trackCivicLearning = (topic, action) =>
     topic, action 
   });
 
-export const trackAIInteraction = (language, questionLength) =>
-  trackEvent('ai_interaction', {
-    language,
-    question_length: questionLength,
+export const trackAIChat = (question, answer) =>
+  trackEvent('ai_chat', {
+    question_length: question?.length || 0,
+    answer_length: answer?.length || 0,
     timestamp: Date.now()
   });
 

@@ -38,28 +38,27 @@ export default function App() {
 
   const style = {
     app: { fontFamily: "'Inter', system-ui, sans-serif", background: COLORS.cream, minHeight: "100vh", color: COLORS.text, overflowX: "hidden" },
-    header: { background: "#fff", borderBottom: `1px solid ${COLORS.border}`, position: "sticky", top: 0, zIndex: 100, boxShadow: "0 4px 20px rgba(0,0,0,0.03)" },
-    tricolorBar: { height: "6px", background: `linear-gradient(to right, ${COLORS.saffron} 33.3%, #fff 33.3%, #fff 66.6%, ${COLORS.green} 66.6%)` },
-    headerTop: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 24px", maxWidth: "1200px", margin: "0 auto" },
+    header: { position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 20px rgba(0,0,0,0.3)", background: `linear-gradient(135deg, ${COLORS.navy} 0%, ${COLORS.navyMid} 60%, ${COLORS.navyLight} 100%)` },
+    tricolorBar: { height: "4px", background: `linear-gradient(to right, ${COLORS.saffron} 33.3%, white 33.3%, white 66.6%, ${COLORS.green} 66.6%)`, width: "100%" },
+    headerTop: { display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 24px", borderBottom: `2px solid ${COLORS.saffron}` },
     logo: { display: "flex", alignItems: "center", gap: "12px", textDecoration: "none" },
-    logoIcon: { fontSize: "32px", background: `${COLORS.saffron}15`, padding: "8px", borderRadius: "12px" },
-    logoText: { fontSize: "22px", fontWeight: "800", margin: 0, color: COLORS.navy, letterSpacing: "-0.5px" },
-    logoSub: { fontSize: "12px", color: COLORS.saffron, fontWeight: "600", textTransform: "uppercase", letterSpacing: "1px", display: "block" },
-    nav: { display: "flex", gap: "8px", padding: "0 24px 16px", overflowX: "auto", scrollbarWidth: "none", maxWidth: "1200px", margin: "0 auto" },
+    logoIcon: { fontSize: "28px" },
+    logoText: { fontSize: "22px", fontWeight: "bold", margin: 0, color: "white" },
+    logoSub: { fontSize: "11px", color: COLORS.gold, letterSpacing: "3px", textTransform: "uppercase", display: "block" },
+    nav: { display: "flex", gap: "2px", padding: "0 16px", overflowX: "auto", scrollbarWidth: "none" },
     navBtn: (active) => ({
-      background: active ? COLORS.saffron : "#f5f3f0",
-      color: active ? "#fff" : COLORS.text,
+      background: "transparent",
+      color: active ? COLORS.saffron : "rgba(255,255,255,0.7)",
       border: "none",
-      padding: "10px 18px",
-      borderRadius: "20px",
+      borderBottom: active ? `3px solid ${COLORS.saffron}` : "3px solid transparent",
+      padding: "10px 16px",
       cursor: "pointer",
       fontFamily: "inherit",
-      fontSize: "14px",
-      fontWeight: "600",
+      fontSize: "13px",
+      fontWeight: active ? 700 : 400,
       whiteSpace: "nowrap",
       transition: "all 0.2s",
-      minHeight: "44px",
-      minWidth: "44px"
+      minHeight: "44px"
     }),
     main: { maxWidth: "1200px", margin: "0 auto", padding: "32px 24px", minHeight: "calc(100vh - 200px)" },
   };
@@ -129,8 +128,10 @@ export default function App() {
       </main>
 
       <footer style={{ background: COLORS.navy, color: "rgba(255,255,255,0.5)", textAlign: "center", padding: "20px", fontSize: "12px", marginTop: "40px" }} role="contentinfo">
-        <div style={{ height: "3px", background: `linear-gradient(to right, ${COLORS.saffron} 33.3%, #fff 33.3%, #fff 66.6%, ${COLORS.green} 66.6%)`, marginBottom: "16px" }} />
-        Chunav Gyaan © 2024 · For civic education only · Not affiliated with ECI · जय हिन्द 🇮🇳
+        <div style={style.tricolorBar} />
+        <div style={{ marginTop: "16px" }}>
+          Chunav Gyaan © 2024 · For civic education only · Not affiliated with ECI · जय हिन्द 🇮🇳
+        </div>
       </footer>
       <FloatingAIChat />
     </div>

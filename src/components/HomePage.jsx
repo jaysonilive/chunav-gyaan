@@ -27,6 +27,7 @@ export default function HomePage({ setTab }) {
       })
       .then(data => {
         setNews(data.articles || []);
+        if (data.isFallback) setNewsError("fallback");
         setNewsLoading(false);
       })
       .catch(err => {
@@ -57,9 +58,11 @@ export default function HomePage({ setTab }) {
   const cardStyle = {
     background: "#ffffff",
     border: `1px solid ${COLORS.border}`,
-    borderRadius: "16px",
-    padding: "24px",
-    boxShadow: "0 4px 20px rgba(0,0,0,0.03)",
+    borderRadius: "12px",
+    padding: "16px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+    transition: "transform 0.2s, box-shadow 0.2s",
+    cursor: "pointer",
   };
 
   const btnStyle = {
@@ -115,7 +118,7 @@ export default function HomePage({ setTab }) {
 
       {/* Latest Election News */}
       <h2 style={{ fontSize: "24px", color: COLORS.navy, marginBottom: "20px" }}>📰 Latest Election News</h2>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "12px" }}>
+      <div className="news-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "12px" }}>
         {newsLoading ? (
           [1, 2, 3, 4].map(i => (
             <div key={i} style={{ ...cardStyle, display: "flex", flexDirection: "column", gap: "12px" }}>
@@ -124,21 +127,44 @@ export default function HomePage({ setTab }) {
               <div style={{ height: "14px", background: "#f0f0f0", borderRadius: "4px", width: "90%", animation: "pulse 1.5s infinite" }} />
             </div>
           ))
-        ) : newsError || news.length === 0 ? (
-          <div style={{ ...cardStyle, gridColumn: "1 / -1", textAlign: "center" }}>
-            <a href="https://eci.gov.in" target="_blank" rel="noopener noreferrer" style={{ color: COLORS.ashoka, fontWeight: "bold", textDecoration: "none" }}>Visit eci.gov.in for latest news</a>
-          </div>
+        ) : newsError === "fallback" || news.length === 0 ? (
+          news.map((item, i) => (
+            <div 
+              key={i} 
+              style={{ ...cardStyle, display: "flex", flexDirection: "column", gap: "8px" }}
+              onClick={() => window.open(item.link, '_blank')}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'; }}
+            >
+              <div style={{ alignSelf: "flex-start", background: `${COLORS.saffron}15`, color: COLORS.saffronDark, fontSize: "11px", fontWeight: "bold", padding: "4px 8px", borderRadius: "12px" }}>{item.source}</div>
+              <h3 style={{ margin: 0, fontSize: "15px", color: COLORS.navy, lineHeight: 1.4, fontWeight: "bold", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{item.title}</h3>
+              <p style={{ margin: "8px 0 0", fontSize: "13px", color: COLORS.textMuted, lineHeight: 1.5, flex: 1, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{item.snippet}</p>
+              <div style={{ fontSize: "12px", color: COLORS.saffron, fontWeight: "bold", marginTop: "10px" }}>Read More →</div>
+            </div>
+          ))
         ) : (
           news.map((item, i) => (
-            <div key={i} style={{ ...cardStyle, display: "flex", flexDirection: "column", gap: "8px" }}>
-              <h3 style={{ margin: 0, fontSize: "16px", color: COLORS.navy, lineHeight: 1.4, fontWeight: "bold" }}>{item.title}</h3>
-              <p style={{ margin: 0, fontSize: "13px", color: COLORS.text, lineHeight: 1.5, flex: 1, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{item.snippet}</p>
-              <div style={{ fontSize: "11px", color: COLORS.textMuted }}>{item.source}</div>
-              <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ fontSize: "13px", color: COLORS.ashoka, textDecoration: "none", fontWeight: "bold", marginTop: "8px" }}>Read More →</a>
+            <div 
+              key={i} 
+              style={{ ...cardStyle, display: "flex", flexDirection: "column", gap: "8px" }}
+              onClick={() => window.open(item.link, '_blank')}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'; }}
+            >
+              <div style={{ alignSelf: "flex-start", background: `${COLORS.saffron}15`, color: COLORS.saffronDark, fontSize: "11px", fontWeight: "bold", padding: "4px 8px", borderRadius: "12px" }}>{item.source}</div>
+              <h3 style={{ margin: 0, fontSize: "15px", color: COLORS.navy, lineHeight: 1.4, fontWeight: "bold", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{item.title}</h3>
+              <p style={{ margin: "8px 0 0", fontSize: "13px", color: COLORS.textMuted, lineHeight: 1.5, flex: 1, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{item.snippet}</p>
+              <div style={{ fontSize: "12px", color: COLORS.saffron, fontWeight: "bold", marginTop: "10px" }}>Read More →</div>
             </div>
           ))
         )}
       </div>
+      
+      {newsError === "fallback" && (
+        <div style={{ fontSize: "12px", color: COLORS.textMuted, textAlign: "center", marginBottom: "16px", fontStyle: "italic" }}>
+          📡 Live news temporarily unavailable — showing curated election resources
+        </div>
+      )}
       <div style={{ fontSize: "12px", color: COLORS.textMuted, textAlign: "right", marginBottom: "32px" }}>Powered by Google Search 🔍</div>
 
       {/* Quick Nav */}
@@ -158,7 +184,12 @@ export default function HomePage({ setTab }) {
           </button>
         ))}
       </div>
-      <style>{`@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }`}</style>
+      <style>{`
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @media (max-width: 600px) {
+          .news-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }

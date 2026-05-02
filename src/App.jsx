@@ -195,12 +195,7 @@ export default function App() {
 
       <footer style={{ background: COLORS.navy, color: "rgba(255,255,255,0.5)", textAlign: "center", padding: "20px", fontSize: "12px", marginTop: "40px" }} role="contentinfo">
         <div style={style.tricolorBar} />
-        <div style={{ marginTop: "16px", marginBottom: "8px" }}>
-          Chunav Gyaan · Powered by Google Charts, Google Fonts, Firebase & Google Search 🔵 · <span style={{fontFamily: COLORS.fonts.hindi}}>जय हिन्द 🇮🇳</span>
-        </div>
-        <div style={{ fontSize: "10px", opacity: 0.7 }}>
-          Typography by Google Fonts · For civic education only · Not affiliated with ECI
-        </div>
+
       </footer>
       <FloatingAIChat />
     </div>

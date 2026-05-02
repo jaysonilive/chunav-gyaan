@@ -208,14 +208,8 @@ export default function HomePage({ setTab }) {
         )}
       </div>
       
-      {newsError === "fallback" && (
-        <div style={{ fontSize: "12px", color: COLORS.textMuted, textAlign: "center", marginBottom: "16px", fontStyle: "italic", fontFamily: COLORS.fonts.body }}>
-          📡 Live updates temporarily unavailable — showing curated election resources
-        </div>
-      )}
-      <div style={{ fontSize: "12px", color: COLORS.textMuted, textAlign: "right", marginBottom: "32px", fontFamily: COLORS.fonts.body }}>
-        🔍 Powered by Google Custom Search
-      </div>
+
+
 
       {/* Election Charts Section */}
       <ElectionCharts />
@@ -236,9 +230,7 @@ export default function HomePage({ setTab }) {
         ))}
       </div>
 
-      <div style={{ textAlign: "center", padding: "32px 12px", fontSize: "12px", color: COLORS.textMuted, borderTop: `1px solid ${COLORS.border}`, marginTop: "48px", fontFamily: COLORS.fonts.body }}>
-        Powered by <strong>Google Charts</strong> · <strong>Google Fonts</strong> · <strong>Google Search</strong> · <strong>Firebase Analytics</strong>
-      </div>
+
 
       <style>{`
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }

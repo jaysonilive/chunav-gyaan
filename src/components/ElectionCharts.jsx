@@ -215,16 +215,7 @@ const ElectionCharts = () => {
         </div>
       </div>
       
-      <div style={{ 
-        textAlign: 'center', 
-        marginTop: '24px', 
-        padding: '16px', 
-        fontSize: '12px', 
-        color: COLORS.textMuted,
-        borderTop: `1px solid ${COLORS.border}`
-      }}>
-        📊 All charts powered by Google Charts API · No API key required — 100% free service
-      </div>
+
     </section>
   );
 };

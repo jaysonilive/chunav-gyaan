@@ -1,4 +1,12 @@
 export default async function handler(req, res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   if (!process.env.GROQ_API_KEY) {
     return res.status(500).json({
       error: "API key not configured on server."
@@ -11,6 +19,10 @@ export default async function handler(req, res) {
 
   try {
     const { messages, systemPrompt } = req.body;
+    
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: "Messages array is required" });
+    }
 
     const response = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",

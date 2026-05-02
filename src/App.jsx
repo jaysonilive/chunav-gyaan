@@ -193,9 +193,28 @@ export default function App() {
         </ErrorBoundary>
       </main>
 
-      <footer style={{ background: COLORS.navy, color: "rgba(255,255,255,0.5)", textAlign: "center", padding: "20px", fontSize: "12px", marginTop: "40px" }} role="contentinfo">
+      <footer style={{ background: COLORS.navy, color: "rgba(255,255,255,0.6)", textAlign: "center", padding: "40px 20px", fontSize: "13px", marginTop: "40px" }} role="contentinfo">
         <div style={style.tricolorBar} />
-
+        <div style={{ marginTop: "24px", marginBottom: "12px", color: "white", fontWeight: "bold", fontSize: "18px", fontFamily: COLORS.fonts.heading }}>
+          Chunav Gyaan
+        </div>
+        <div style={{ marginBottom: "20px", maxWidth: "600px", margin: "0 auto 20px", lineHeight: 1.6, fontFamily: COLORS.fonts.body }}>
+          Empowering citizens with knowledge about the Indian electoral process. Learn, participate, and contribute to the world's largest democracy.
+        </div>
+        <div style={{ display: "flex", justifyContent: "center", gap: "24px", marginBottom: "24px", flexWrap: "wrap", fontFamily: COLORS.fonts.body }}>
+          <span style={{ cursor: "pointer" }}>Privacy Policy</span>
+          <span style={{ cursor: "pointer" }}>Terms of Use</span>
+          <span style={{ cursor: "pointer" }}>Civic Resources</span>
+        </div>
+        <div style={{ fontSize: "11px", opacity: 0.8, borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "20px", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", flexWrap: "wrap", fontFamily: COLORS.fonts.body }}>
+          <span>© {new Date().getFullYear()} Chunav Gyaan</span>
+          <span>•</span>
+          <span>For educational purposes only</span>
+          <span>•</span>
+          <span>Not affiliated with the Election Commission of India</span>
+          <span>•</span>
+          <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>Made with ❤️ in India <span style={{fontFamily: COLORS.fonts.hindi}}>🇮🇳</span></span>
+        </div>
       </footer>
       <FloatingAIChat />
     </div>

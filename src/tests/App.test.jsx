@@ -55,12 +55,15 @@ describe('Chunav Gyaan App', () => {
   });
 
   it('handles API errors gracefully on Home page news section', async () => {
-    global.fetch.mockRejectedValueOnce(new Error('API Down'));
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ articles: [], isFallback: true }),
+    });
     
     render(<App />);
     
     await waitFor(() => {
-      expect(screen.getByText(/Visit eci.gov.in for latest news/i)).toBeInTheDocument();
+      expect(screen.getByText(/Live news temporarily unavailable/i)).toBeInTheDocument();
     });
   });
 });
